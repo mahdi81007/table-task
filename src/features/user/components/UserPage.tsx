@@ -7,25 +7,27 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Spinner } from "@/components/ui/spinner"
-import { useGetUsersQuery } from "@/features/user/api/useGetUsers.ts"
-import {useState} from "react";
+import { useGetUsersQuery } from "@/features/user/api/useGetUsers"
+import { useState } from "react"
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink, PaginationNext,
+    PaginationLink,
+    PaginationNext,
     PaginationPrevious
-} from "@/components/ui/pagination.tsx";
-import {Input} from "@/components/ui/input.tsx";
-const pageSize:number = 5
+} from "@/components/ui/pagination"
+import { Input } from "@/components/ui/input"
+
+const pageSize: number = 5
 
 function UserPage() {
-    const { data, isLoading } = useGetUsersQuery()
+    const { data, isLoading ,isError} = useGetUsersQuery()
     const users = data?.data || []
-    const [filter,setFilter] = useState('')
+    const [filter, setFilter] = useState('')
     const [page, setPage] = useState(1)
 
-    const filtered =  users.filter((p: any) =>
+    const filtered = users.filter((p) =>
         p?.name.toLowerCase().includes(filter.toLowerCase())
     )
 
@@ -34,29 +36,38 @@ function UserPage() {
 
     if (isLoading)
         return (
-            <div>
+            <div className="flex justify-center items-center min-h-[50vh]">
                 <Spinner />
             </div>
         )
-
+    if (isError){
+        return (
+            <div className={'text-center'}>error</div>
+        )
+    }
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-semibold mb-6 text-foreground">👥 User List</h1>
-            <Input
-                placeholder="Search title..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="w-64"
-            />
-            <div className="overflow-x-auto rounded-xl border border-border shadow-sm mt-6">
+        <div className="p-4 sm:p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
+                    👥 User List
+                </h1>
+                <Input
+                    placeholder="Search name..."
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="w-full sm:w-64"
+                />
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow>
-                            <TableHead className="w-[60px]">ID</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Username</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>City</TableHead>
+                            <TableHead className="w-[50px] sm:w-[60px] text-xs sm:text-sm">ID</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                            <TableHead className="hidden md:table-cell text-xs sm:text-sm">Username</TableHead>
+                            <TableHead className="text-xs sm:text-sm">Email</TableHead>
+                            <TableHead className="hidden sm:table-cell text-xs sm:text-sm">City</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -64,45 +75,48 @@ function UserPage() {
                         {paginated?.map((user: any) => (
                             <TableRow
                                 key={user.id}
-                                className="hover:bg-muted/40 transition-colors"
+                                className="hover:bg-muted/40 transition-colors text-xs sm:text-sm"
                             >
                                 <TableCell>{user.id}</TableCell>
                                 <TableCell className="font-medium">{user.name}</TableCell>
-                                <TableCell>{user.username}</TableCell>
+                                <TableCell className="hidden md:table-cell">{user.username}</TableCell>
                                 <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.address?.city}</TableCell>
+                                <TableCell className="hidden sm:table-cell">{user.address?.city}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
+
             {totalPages > 1 && (
-                <Pagination className={'mt-6'}>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                            />
-                        </PaginationItem>
-
-                        {Array.from({ length: totalPages }).map((_, i) => (
-                            <PaginationItem key={i}>
-                                <PaginationLink
-                                    isActive={page === i + 1}
-                                    onClick={() => setPage(i + 1)}
-                                >
-                                    {i + 1}
-                                </PaginationLink>
+                <div className="flex justify-center mt-6">
+                    <Pagination>
+                        <PaginationContent className="flex flex-wrap justify-center gap-2">
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                                />
                             </PaginationItem>
-                        ))}
 
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <PaginationItem key={i}>
+                                    <PaginationLink
+                                        isActive={page === i + 1}
+                                        onClick={() => setPage(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             )}
         </div>
     )

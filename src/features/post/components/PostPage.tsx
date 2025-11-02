@@ -8,57 +8,66 @@ import {
 } from "@/components/ui/table"
 import { Spinner } from "@/components/ui/spinner"
 import { useGetPostsQuery } from "../api/useGetPosts"
-import {useState} from "react";
-import {Input} from "@/components/ui/input";
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink, PaginationNext,
-    PaginationPrevious
-} from "@/components/ui/pagination";
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
 
-
-const pageSize:number = 10
+const pageSize: number = 10
 
 function PostPage() {
-    const { data, isLoading } = useGetPostsQuery()
+    const { data, isLoading,isError } = useGetPostsQuery()
     const posts = data?.data || []
 
-    const [filter,setFilter] = useState('')
+    const [filter, setFilter] = useState("")
     const [page, setPage] = useState(1)
 
-    const filtered =  posts.filter((p: any) =>
+    const filtered = posts.filter((p: any) =>
         p.title.toLowerCase().includes(filter.toLowerCase())
     )
 
     const totalPages = Math.ceil(filtered.length / pageSize)
     const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
+
     if (isLoading)
         return (
-            <div>
+            <div className="flex justify-center items-center min-h-[50vh]">
                 <Spinner />
             </div>
         )
-
+    if (isError){
+        return (
+            <div className={'text-center'}>error</div>
+        )
+    }
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-semibold mb-6 text-foreground">📝 Posts</h1>
-            <Input
-                placeholder="Search title..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="w-64"
-            />
+        <div className="p-4 sm:p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
+                    📝 Posts
+                </h1>
+                <Input
+                    placeholder="Search title..."
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="w-full sm:w-64"
+                />
+            </div>
 
-            <div className="overflow-x-auto rounded-xl border border-border shadow-sm mt-6">
+            <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
                 <Table>
                     <TableHeader className="bg-muted/50">
-                        <TableRow>
-                            <TableHead className="w-[60px]">ID</TableHead>
-                            <TableHead>User ID</TableHead>
+                        <TableRow className={'text-xs sm:text-sm'}>
+                            <TableHead className="w-[50px] sm:w-[60px] ">ID</TableHead>
+                            <TableHead className="hidden sm:table-cell ">User ID</TableHead>
                             <TableHead>Title</TableHead>
-                            <TableHead>Body</TableHead>
+                            <TableHead className="hidden md:table-cell">Body</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -66,12 +75,14 @@ function PostPage() {
                         {paginated.map((post: any) => (
                             <TableRow
                                 key={post.id}
-                                className="hover:bg-muted/40 transition-colors"
+                                className="hover:bg-muted/40 transition-colors text-xs sm:text-sm"
                             >
                                 <TableCell>{post.id}</TableCell>
-                                <TableCell>{post.userId}</TableCell>
-                                <TableCell className="font-medium">{post.title}</TableCell>
-                                <TableCell className="whitespace-pre-line text-sm text-muted-foreground">
+                                <TableCell className="hidden sm:table-cell">{post.userId}</TableCell>
+                                <TableCell className="font-sm md:font-medium whitespace-normal break-words">
+                                    {post.title}
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell whitespace-pre-line text-muted-foreground">
                                     {post.body}
                                 </TableCell>
                             </TableRow>
@@ -80,32 +91,34 @@ function PostPage() {
                 </Table>
             </div>
             {totalPages > 1 && (
-                <Pagination className={'mt-6'}>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                            />
-                        </PaginationItem>
-
-                        {Array.from({ length: totalPages }).map((_, i) => (
-                            <PaginationItem key={i}>
-                                <PaginationLink
-                                    isActive={page === i + 1}
-                                    onClick={() => setPage(i + 1)}
-                                >
-                                    {i + 1}
-                                </PaginationLink>
+                <div className="flex justify-center mt-6">
+                    <Pagination>
+                        <PaginationContent className="flex flex-wrap justify-center gap-2">
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                                />
                             </PaginationItem>
-                        ))}
 
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <PaginationItem key={i}>
+                                    <PaginationLink
+                                        isActive={page === i + 1}
+                                        onClick={() => setPage(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             )}
         </div>
     )
