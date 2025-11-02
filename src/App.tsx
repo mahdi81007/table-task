@@ -5,9 +5,6 @@ import {AppSidebar} from "@/components/appSidebar";
 import ThemeToggle from "@/components/themToggle";
 
 function App() {
-    const savedTheme =
-        JSON.parse(localStorage.getItem("theme") || '{"state":{"theme":"light"}}').state.theme
-    document.documentElement.classList.toggle("dark", savedTheme === "dark")
     return (
         <>
             <SidebarProvider>

@@ -1,4 +1,4 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 
 let queryClient: QueryClient | undefined
 
@@ -15,15 +15,4 @@ export function getQueryClient() {
     if (queryClient) return queryClient
     queryClient = new QueryClient({ defaultOptions })
     return queryClient
-}
-
-export function withQueryClient(fn: any) {
-    const query = getQueryClient()
-    return async (ctx: any) => {
-        const props = await fn(ctx, query)
-        return {
-            ...(props || {}),
-            dehydratedState: dehydrate(query),
-        }
-    }
 }
