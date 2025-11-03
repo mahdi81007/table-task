@@ -18,6 +18,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import type { postQueryResponse } from "../types/postsTypes"
 
 const pageSize: number = 10
 
@@ -72,7 +73,7 @@ function PostPage() {
                     </TableHeader>
 
                     <TableBody>
-                        {paginated.map((post: any) => (
+                        {paginated.map((post: postQueryResponse) => (
                             <TableRow
                                 key={post.id}
                                 className="hover:bg-muted/40 transition-colors text-xs sm:text-sm"

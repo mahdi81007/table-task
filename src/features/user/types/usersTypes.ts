@@ -3,5 +3,7 @@ export interface userQueryResponse {
     name:string;
     username:string;
     email:string;
-    city:string;
+    address:{
+        city:string
+    }
 }

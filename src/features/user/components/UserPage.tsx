@@ -18,13 +18,14 @@ import {
     PaginationPrevious
 } from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
+import type { userQueryResponse } from "../types/usersTypes"
 
 const pageSize: number = 5
 
 function UserPage() {
     const { data, isLoading ,isError} = useGetUsersQuery()
-    const users = data?.data || []
-    const [filter, setFilter] = useState('')
+    const users:userQueryResponse = data?.data || []
+    const [filter, setFilter] = useState<string>('')
     const [page, setPage] = useState(1)
 
     const filtered = users.filter((p) =>
@@ -72,7 +73,7 @@ function UserPage() {
                     </TableHeader>
 
                     <TableBody>
-                        {paginated?.map((user: any) => (
+                        {paginated?.map((user: userQueryResponse) => (
                             <TableRow
                                 key={user.id}
                                 className="hover:bg-muted/40 transition-colors text-xs sm:text-sm"
